@@ -1,0 +1,92 @@
+.form-control:focus {
+    box-shadow: none;
+    outline: none;
+  }
+  
+  .card {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15); 
+  }
+  
+
+  :root {
+    --background-color-light: #f0f0f0;
+    --background-color-dark: #121212;
+    --text-color-light: #000;
+    --text-color-dark: #fff;
+  }
+  
+  [data-theme="light"] {
+    background-color: var(--background-color-light);
+    color: var(--text-color-light);
+  }
+  
+  [data-theme="dark"] {
+    background-color: var(--background-color-dark);
+    color: var(--text-color-dark);
+  }
+  
+  /* Reset margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Full width and height for root elements */
+  html, body, #root, .app-container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-color-dark);
+  }
+  
+  /* Container styles */
+  .container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-radius: 8px;
+  }
+  
+  .app-container {
+    position: relative;
+  }
+  
+  /* Theme toggle button */
+  .theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+
+  :root {
+    --background-color-light: #f0f0f0;
+    --background-color-dark: #121212;
+    --text-color-light: #000000;
+    --text-color-dark: #ffffff;
+  }
+  
+  body[data-theme='dark'] {
+    background-color: var(--background-color-dark);
+    color: var(--text-color-dark);
+  }
+  
+  body[data-theme='light'] {
+    background-color: var(--background-color-light);
+    color: var(--text-color-light);
+  }
+  
+  .footer {
+    text-align: center;
+    padding: 1rem;
+    width: 100%;
+  }
+  
