@@ -10,8 +10,9 @@ const AccountPage = () => {
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
   const [updating, setUpdating] = useState(false);
-  const [darkTheme, setDarkTheme] = useState(true); // Theme state
+  const [darkTheme, setDarkTheme] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,7 +26,7 @@ const AccountPage = () => {
     const fetchUser = async () => {
       try {
         const res = await axios.get('/auth/profile', {
-          withCredentials: true, // Include session cookies
+          withCredentials: true,
         });
         setUser(res.data.user);
         setName(res.data.user.name || '');
@@ -46,9 +47,40 @@ const AccountPage = () => {
     fetchUser();
   }, []);
 
+  // Validation function
+  const validate = () => {
+    const errors = {};
+
+    if (!name.trim()) {
+      errors.name = 'Name is required';
+    } else if (!/^[A-Za-z\s]+$/.test(name)) {
+      errors.name = 'Name can only contain letters and spaces';
+    } else if (name.length < 2) {
+      errors.name = 'Name must be at least 2 characters long';
+    }
+
+    if (!phone.trim()) {
+      errors.phone = 'Phone number is required';
+    } else if (!/^\+?\d{10,15}$/.test(phone)) {
+      errors.phone = 'Invalid phone number format';
+    }
+
+    if (!address.trim()) {
+      errors.address = 'Address is required';
+    } else if (address.length < 5) {
+      errors.address = 'Address must be at least 5 characters long';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     setError(null);
+
+    if (!validate()) return; // Return early if validation fails
+
     setUpdating(true);
 
     try {
@@ -76,7 +108,7 @@ const AccountPage = () => {
   const toggleTheme = () => {
     const newTheme = !darkTheme;
     setDarkTheme(newTheme);
-    localStorage.setItem('theme', newTheme ? 'dark' : 'light'); // Save theme to localStorage
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
   };
 
   if (loading) {
@@ -105,7 +137,7 @@ const AccountPage = () => {
       </div>
 
       <h2 className="mb-4" style={{ color: darkTheme ? '#fdda0d' : '#007bff' }}>Account Information</h2>
-      
+
       {isEditing ? (
         <form onSubmit={handleUpdate} style={{ width: '100%', maxWidth: '400px' }}>
           <div className="mb-3">
@@ -116,14 +148,15 @@ const AccountPage = () => {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
               style={{
                 backgroundColor: darkTheme ? '#2c2f3a' : 'white',
                 color: darkTheme ? 'white' : 'black',
-                border: 'none'
+                border: 'none',
               }}
             />
+            {formErrors.name && <small className="text-danger">{formErrors.name}</small>}
           </div>
+
           <div className="mb-3">
             <label htmlFor="phone" className="form-label">Phone</label>
             <input
@@ -132,14 +165,15 @@ const AccountPage = () => {
               id="phone"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              required
               style={{
                 backgroundColor: darkTheme ? '#2c2f3a' : 'white',
                 color: darkTheme ? 'white' : 'black',
-                border: 'none'
+                border: 'none',
               }}
             />
+            {formErrors.phone && <small className="text-danger">{formErrors.phone}</small>}
           </div>
+
           <div className="mb-3">
             <label htmlFor="address" className="form-label">Address</label>
             <input
@@ -148,14 +182,15 @@ const AccountPage = () => {
               id="address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
-              required
               style={{
                 backgroundColor: darkTheme ? '#2c2f3a' : 'white',
                 color: darkTheme ? 'white' : 'black',
-                border: 'none'
+                border: 'none',
               }}
             />
+            {formErrors.address && <small className="text-danger">{formErrors.address}</small>}
           </div>
+
           <button type="submit" className={`btn ${darkTheme ? 'btn-warning' : 'btn-primary'} w-100`} disabled={updating}>
             {updating ? 'Saving...' : 'Save'}
           </button>
