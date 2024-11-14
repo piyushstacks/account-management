@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-
+import API from '../axiosConfig';
 const RegistrationPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -70,7 +70,7 @@ const RegistrationPage = () => {
     if (!validate()) return;
 
     try {
-      const response = await axios.post(
+      const response = await API.post(
         '/auth/register',
         { email, password, name, phone, address },
         { withCredentials: true }

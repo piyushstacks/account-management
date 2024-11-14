@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
+import API from '../axiosConfig';
+
+
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -55,7 +58,7 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/auth/login', formData, {
+      const response = await API.post('/auth/login', formData, {
         headers: { 'Content-Type': 'application/json' },
       });
 

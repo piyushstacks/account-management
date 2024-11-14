@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import API from '../axiosConfig';
 const AccountPage = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -25,7 +25,7 @@ const AccountPage = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get('/auth/profile', {
+        const res = await API.get('/auth/profile', {
           withCredentials: true,
         });
         setUser(res.data.user);
@@ -84,7 +84,7 @@ const AccountPage = () => {
     setUpdating(true);
 
     try {
-      const res = await axios.put(
+      const res = await API.put(
         '/auth/profile',
         { name, phone, address },
         { withCredentials: true }
