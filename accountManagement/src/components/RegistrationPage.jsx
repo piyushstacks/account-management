@@ -9,28 +9,72 @@ const RegistrationPage = () => {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [error, setError] = useState('');
+  const [formErrors, setFormErrors] = useState({});
   const [darkTheme, setDarkTheme] = useState(true); // Theme state
   const navigate = useNavigate();
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       setDarkTheme(savedTheme === 'dark');
     }
   }, []);
+
+  // Validation function
+  const validate = () => {
+    const errors = {};
+
+    // Email validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      errors.email = 'Email is required';
+    } else if (!emailPattern.test(email)) {
+      errors.email = 'Invalid email format';
+    }
+
+    // Password validation (minimum 8 characters, with letters and numbers)
+    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    if (!password) {
+      errors.password = 'Password is required';
+    } else if (!passwordPattern.test(password)) {
+      errors.password = 'Password must be at least 8 characters long and include both letters and numbers';
+    }
+
+    // Name validation (must not be empty)
+    if (!name) {
+      errors.name = 'Name is required';
+    }
+
+    // Phone number validation (must be 10 digits)
+    const phonePattern = /^[0-9]{10}$/;
+    if (!phone) {
+      errors.phone = 'Phone number is required';
+    } else if (!phonePattern.test(phone)) {
+      errors.phone = 'Phone number must be 10 digits';
+    }
+
+    // Address validation (must not be empty)
+    if (!address) {
+      errors.address = 'Address is required';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
+    // Validate form fields before submitting
+    if (!validate()) return;
+
     try {
-      const response = await axios.post('/auth/register', {
-        email,
-        password,
-        name,
-        phone,
-        address,
-      }, {
-        withCredentials: true // Important for session-based authentication
-      });
+      const response = await axios.post(
+        '/auth/register',
+        { email, password, name, phone, address },
+        { withCredentials: true }
+      );
 
       if (response.data.message === 'Registration successful') {
         navigate('/login');
@@ -50,7 +94,9 @@ const RegistrationPage = () => {
 
   return (
     <div
-      className={`d-flex justify-content-center align-items-center min-vh-100 ${darkTheme ? 'bg-dark text-light' : 'bg-light text-dark'}`}
+      className={`d-flex justify-content-center align-items-center min-vh-100 ${
+        darkTheme ? 'bg-dark text-light' : 'bg-light text-dark'
+      }`}
     >
       <div className="position-absolute top-0 end-0 m-3">
         <button onClick={toggleTheme} className="btn btn-outline-secondary">
@@ -67,7 +113,9 @@ const RegistrationPage = () => {
           color: darkTheme ? 'white' : 'black',
         }}
       >
-        <h2 className="text-center mb-4" style={{ color: darkTheme ? '#fdda0d' : '#007bff' }}>Register</h2>
+        <h2 className="text-center mb-4" style={{ color: darkTheme ? '#fdda0d' : '#007bff' }}>
+          Register
+        </h2>
         <form onSubmit={handleSubmit}>
           {error && <div className="alert alert-danger">{error}</div>}
 
@@ -80,8 +128,13 @@ const RegistrationPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ backgroundColor: darkTheme ? '#2c2f3a' : 'white', color: darkTheme ? 'white' : 'black', border: 'none' }}
+              style={{
+                backgroundColor: darkTheme ? '#2c2f3a' : 'white',
+                color: darkTheme ? 'white' : 'black',
+                border: 'none',
+              }}
             />
+            {formErrors.email && <small className="text-danger">{formErrors.email}</small>}
           </div>
 
           <div className="mb-3">
@@ -93,8 +146,13 @@ const RegistrationPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              style={{ backgroundColor: darkTheme ? '#2c2f3a' : 'white', color: darkTheme ? 'white' : 'black', border: 'none' }}
+              style={{
+                backgroundColor: darkTheme ? '#2c2f3a' : 'white',
+                color: darkTheme ? 'white' : 'black',
+                border: 'none',
+              }}
             />
+            {formErrors.password && <small className="text-danger">{formErrors.password}</small>}
           </div>
 
           <div className="mb-3">
@@ -106,8 +164,13 @@ const RegistrationPage = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              style={{ backgroundColor: darkTheme ? '#2c2f3a' : 'white', color: darkTheme ? 'white' : 'black', border: 'none' }}
+              style={{
+                backgroundColor: darkTheme ? '#2c2f3a' : 'white',
+                color: darkTheme ? 'white' : 'black',
+                border: 'none',
+              }}
             />
+            {formErrors.name && <small className="text-danger">{formErrors.name}</small>}
           </div>
 
           <div className="mb-3">
@@ -119,8 +182,13 @@ const RegistrationPage = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
-              style={{ backgroundColor: darkTheme ? '#2c2f3a' : 'white', color: darkTheme ? 'white' : 'black', border: 'none' }}
+              style={{
+                backgroundColor: darkTheme ? '#2c2f3a' : 'white',
+                color: darkTheme ? 'white' : 'black',
+                border: 'none',
+              }}
             />
+            {formErrors.phone && <small className="text-danger">{formErrors.phone}</small>}
           </div>
 
           <div className="mb-3">
@@ -132,8 +200,13 @@ const RegistrationPage = () => {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               required
-              style={{ backgroundColor: darkTheme ? '#2c2f3a' : 'white', color: darkTheme ? 'white' : 'black', border: 'none' }}
+              style={{
+                backgroundColor: darkTheme ? '#2c2f3a' : 'white',
+                color: darkTheme ? 'white' : 'black',
+                border: 'none',
+              }}
             />
+            {formErrors.address && <small className="text-danger">{formErrors.address}</small>}
           </div>
 
           <button type="submit" className={`btn ${darkTheme ? 'btn-warning' : 'btn-primary'} w-100`}>

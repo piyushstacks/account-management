@@ -5,14 +5,39 @@ import { useNavigate, Link } from 'react-router-dom';
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [darkTheme, setDarkTheme] = useState(true); // Theme state
+  const [darkTheme, setDarkTheme] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
+  // Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Validate email and password
+  const validate = () => {
+    const errors = {};
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formData.email) {
+      errors.email = 'Email is required';
+    } else if (!emailPattern.test(formData.email)) {
+      errors.email = 'Invalid email format';
+    }
+
+    if (!formData.password) {
+      errors.password = 'Password is required';
+    } else if (formData.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters long';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Load theme from localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
@@ -20,20 +45,30 @@ const LoginPage = () => {
     }
   }, []);
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (!validate()) return;
+
     setLoading(true);
 
     try {
       const response = await axios.post('/auth/login', formData, {
         headers: { 'Content-Type': 'application/json' },
       });
+
       const { token, user } = response.data;
 
       // Store token and user data
-      localStorage.setItem('token', token);
-      localStorage.setItem('userData', JSON.stringify(user));
+      if (rememberMe) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('userData', JSON.stringify(user));
+      } else {
+        sessionStorage.setItem('token', token);
+        sessionStorage.setItem('userData', JSON.stringify(user));
+      }
 
       navigate('/account');
     } catch (error) {
@@ -48,19 +83,21 @@ const LoginPage = () => {
   const toggleTheme = () => {
     const newTheme = !darkTheme;
     setDarkTheme(newTheme);
-    localStorage.setItem('theme', newTheme ? 'dark' : 'light'); // Save theme to localStorage
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
   };
 
   return (
     <div
-      className={`d-flex justify-content-center align-items-center min-vh-100 ${darkTheme ? 'bg-dark text-light' : 'bg-light text-dark'}`}
+      className={`d-flex justify-content-center align-items-center min-vh-100 ${
+        darkTheme ? 'bg-dark text-light' : 'bg-light text-dark'
+      }`}
     >
       <div className="position-absolute top-0 end-0 m-3">
         <button onClick={toggleTheme} className="btn btn-outline-secondary">
           {darkTheme ? 'Light Mode' : 'Dark Mode'}
         </button>
       </div>
-      
+
       <div
         className="card p-4"
         style={{
@@ -70,7 +107,9 @@ const LoginPage = () => {
           color: darkTheme ? 'white' : 'black',
         }}
       >
-        <h2 className="text-center mb-4" style={{ color: darkTheme ? '#fdda0d' : '#007bff' }}>Login</h2>
+        <h2 className="text-center mb-4" style={{ color: darkTheme ? '#fdda0d' : '#007bff' }}>
+          Login
+        </h2>
         <form onSubmit={handleSubmit}>
           {error && <div className="alert alert-danger">{error}</div>}
 
@@ -84,8 +123,14 @@ const LoginPage = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              style={{ backgroundColor: darkTheme ? '#2c2f3a' : 'white', color: darkTheme ? 'white' : 'black', border: 'none' }}
+              aria-describedby="emailHelp"
+              style={{
+                backgroundColor: darkTheme ? '#2c2f3a' : 'white',
+                color: darkTheme ? 'white' : 'black',
+                border: 'none',
+              }}
             />
+            {formErrors.email && <small className="text-danger">{formErrors.email}</small>}
           </div>
 
           <div className="mb-3">
@@ -98,14 +143,34 @@ const LoginPage = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              style={{ backgroundColor: darkTheme ? '#2c2f3a' : 'white', color: darkTheme ? 'white' : 'black', border: 'none' }}
+              aria-describedby="passwordHelp"
+              style={{
+                backgroundColor: darkTheme ? '#2c2f3a' : 'white',
+                color: darkTheme ? 'white' : 'black',
+                border: 'none',
+              }}
             />
+            {formErrors.password && <small className="text-danger">{formErrors.password}</small>}
           </div>
 
-          <button type="submit" className={`btn ${darkTheme ? 'btn-warning' : 'btn-primary'} w-100`}>
+          <div className="form-check mb-3">
+            <input
+              type="checkbox"
+              className="form-check-input"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={() => setRememberMe(!rememberMe)}
+            />
+            <label className="form-check-label" htmlFor="rememberMe">
+              Remember Me
+            </label>
+          </div>
+
+          <button type="submit" className={`btn ${darkTheme ? 'btn-warning' : 'btn-primary'} w-100`} disabled={loading}>
             {loading ? 'Signing in...' : 'Login'}
           </button>
         </form>
+
         <div className="text-center mt-3">
           <small>
             Don't have an account?{' '}
