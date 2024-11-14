@@ -4,8 +4,9 @@ const session = require('express-session');
 const authRoutes = require('./routes/authRoutes');
 const cors = require('cors');
 const app = express();
+const cookieParser = require('cookie-parser');
 
-// Middleware
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
 // Session setup

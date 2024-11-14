@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -12,6 +12,13 @@ const LoginPage = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setDarkTheme(savedTheme === 'dark');
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +46,9 @@ const LoginPage = () => {
 
   // Toggle between light and dark theme
   const toggleTheme = () => {
-    setDarkTheme(!darkTheme);
+    const newTheme = !darkTheme;
+    setDarkTheme(newTheme);
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light'); // Save theme to localStorage
   };
 
   return (

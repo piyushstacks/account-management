@@ -15,6 +15,13 @@ const AccountPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setDarkTheme(savedTheme === 'dark');
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await axios.get('/auth/profile', {
@@ -67,7 +74,9 @@ const AccountPage = () => {
   };
 
   const toggleTheme = () => {
-    setDarkTheme(!darkTheme);
+    const newTheme = !darkTheme;
+    setDarkTheme(newTheme);
+    localStorage.setItem('theme', newTheme ? 'dark' : 'light'); // Save theme to localStorage
   };
 
   if (loading) {
